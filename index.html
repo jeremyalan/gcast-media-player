@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <title>My Chromecast App</title>
+   <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
+   <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+   <script type="text/javascript" src="sender.js"></script>
+</head>
+<body style="background: #ccc">
+   <div>
+      <div>
+         <label>Media URL</label>
+      </div>
+      <div>
+         <input type="text" class="media-url" />
+      </div>
+   </div>
+   <div style="padding-top: 10px">
+      <a href="#" class="initialize">Initialize Sender</a>
+   </div>
+   <div>
+      <a href="#" class="connect-to-cast">Connect to Chromecast</a>
+   </div>
+   <div>
+      <a href="#" class="retrieve-media">Retrieve Media</a>
+   </div>
+   <div>
+      <a href="#" class="play-media">Play</a>
+      <span>&nbsp;</span>
+      <a href="#" class="pause-media">Pause</a>
+      <span>&nbsp;</span>
+      <a href="#" class="stop-media">Stop</a>
+   </div>
+   <div>
+      <a href="="#"" class="seek-back-10">&lt;&lt; 10 seconds</a>
+      <span>&nbsp;</span>
+      <a href="="#"" class="seek-forward-10">10 seconds &gt;&gt;</a>
+   </div>
+   <div>
+      <h2>Logs</h2>
+      <ul class="log"></ul>
+   </div>
+</body>
+</html>
