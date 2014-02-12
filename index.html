@@ -13,7 +13,11 @@
          <label>Media URL</label>
       </div>
       <div>
-         <input type="text" class="media-url" />
+         <input name="media_url" type="text" class="media-url" />
+         <select name="media_type">
+            <option value="video/mp4">MP4 (video)</option>
+            <option value="audio/mp3">MP3 (audio)</option>
+         </select>
       </div>
    </div>
    <div style="padding-top: 10px">
@@ -33,9 +37,9 @@
       <a href="#" class="stop-media">Stop</a>
    </div>
    <div>
-      <a href="="#"" class="seek-back-10">&lt;&lt; 10 seconds</a>
+      <a href="#" class="seek-back-10">&lt;&lt; 10 seconds</a>
       <span>&nbsp;</span>
-      <a href="="#"" class="seek-forward-10">10 seconds &gt;&gt;</a>
+      <a href="#" class="seek-forward-10">10 seconds &gt;&gt;</a>
    </div>
    <div>
       <h2>Logs</h2>
