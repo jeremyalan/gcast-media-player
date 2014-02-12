@@ -55,14 +55,14 @@ var createSession = function () {
       });
 };
 
-var retrieveMedia = function (url) {
+var retrieveMedia = function (url, mediaType) {
    if (session === null) {
       log('Unable to retrieve media, no active session');
       return;
    }
 
    var mediaInfo = new chrome.cast.media.MediaInfo(url);
-   mediaInfo.contentType = 'text/html';
+   mediaInfo.contentType = mediaType;
   
    var request = new chrome.cast.media.LoadRequest(mediaInfo);
    
@@ -165,8 +165,9 @@ $(function () {
    $('.retrieve-media').click(function (e) {
       e.preventDefault();
       
-      var url = $('input.media-url').val();
-      retrieveMedia(url);
+      var url = $('input[name=media_url]').val();
+      var mediaType = $('select[name=media_type]').val();
+      retrieveMedia(url, mediaType);
    });
 
    $('.play-media').click(function (e) {
