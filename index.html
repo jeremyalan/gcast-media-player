@@ -1,49 +1,111 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-   <meta charset="UTF-8">
-   <title>My Chromecast App</title>
-   <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
-   <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
-   <script type="text/javascript" src="sender.js"></script>
-</head>
-<body style="background: #ccc">
-   <div>
-      <div>
-         <label>Media URL</label>
+   <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+       
+      <title>GCast Media Player</title>
+      
+      <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
+      <link rel="stylesheet" href="styles/font-awesome/css/font-awesome.min.css" />
+      <link rel="stylesheet" href="styles/cover.css" />
+      <!--<link rel="stylesheet/less" type="text/css" href="styles/styles.less" />-->
+   
+      <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+      <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+      <!--[if lt IE 9]>
+         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+      <![endif]-->
+      
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/less.js/1.6.2/less.js"></script>
+      <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
+      <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+      <!--<script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>-->
+      <script type="text/javascript" src="scripts/sender.js"></script>
+   </head>
+   <body>
+      <div class="site-wrapper">
+         <div class="site-wrapper-inner">
+            <div class="cover-container">
+               <div class="masthead clearfix">
+                  <div class="inner">
+                     <h3 class="masthead-brand">GCast Media Player</h3>
+                     <ul class="nav masthead-nav">
+                        <li class="active"><a href="#">Home</a></li>
+                     </ul>
+                  </div>
+               </div>
+   
+               <div class="inner cover">
+                  <div class="media-player">
+                     <div class="row" style="margin-bottom: 10px">
+                        <div class="col-xs-12">
+                           <input type="range" class="input-block-level" />   
+                        </div>
+                     </div>
+                     <div class="row">
+                        <div class="col-xs-3">
+                           <button class="btn btn-lg btn-block btn-default">
+                              Back
+                           </button>
+                        </div>
+                        <div class="col-xs-6">
+                           <button class="btn btn-lg btn-block btn-default">
+                              Play
+                           </button>
+                        </div>
+                        <div class="col-xs-3">
+                           <button class="btn btn-lg btn-block btn-default">
+                              Fwd
+                           </button>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+   
+               <div class="mastfoot">
+                  <div class="inner">
+                     <p>
+                        Created by <a href="twitter.com/jeremyalan">@jeremyalan</a>, source available on 
+                        <a href="http://www.github.com/jeremyalan/gcast-media-player">Github</a>.
+                     </p>
+                  </div>
+               </div>
+            </div>
+         </div>
       </div>
-      <div>
-         <input name="media_url" type="text" class="media-url" />
-         <select name="media_type">
-            <option value="video/mp4">MP4 (video)</option>
-            <option value="audio/mp3">MP3 (audio)</option>
-         </select>
-      </div>
-   </div>
-   <div style="padding-top: 10px">
-      <a href="#" class="initialize">Initialize Sender</a>
-   </div>
-   <div>
-      <a href="#" class="connect-to-cast">Connect to Chromecast</a>
-   </div>
-   <div>
-      <a href="#" class="retrieve-media">Retrieve Media</a>
-   </div>
-   <div>
-      <a href="#" class="play-media">Play</a>
-      <span>&nbsp;</span>
-      <a href="#" class="pause-media">Pause</a>
-      <span>&nbsp;</span>
-      <a href="#" class="stop-media">Stop</a>
-   </div>
-   <div>
-      <a href="#" class="seek-back-10">&lt;&lt; 10 seconds</a>
-      <span>&nbsp;</span>
-      <a href="#" class="seek-forward-10">10 seconds &gt;&gt;</a>
-   </div>
-   <div>
-      <h2>Logs</h2>
-      <ul class="log"></ul>
-   </div>
-</body>
+      
+      <script id="style-less" type="style/less">
+         .media-player {
+            border-radius: 4px;
+            border: 1px solid white;
+            padding: 16px;
+         }
+      </script>
+      
+      <script>
+         $(function () {
+            new(less.Parser)('local').parse($('#style-less').html(), function (e, root) {
+              var css = root.toCSS();
+              
+              var style = $('<style></style>');
+              style.html(css);
+              
+              $('body').append(style);
+            });
+         });
+      </script>
+   </body>
 </html>
+
+
+
+
+
+
+
+
+
+
