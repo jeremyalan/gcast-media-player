@@ -43,24 +43,24 @@
                      <div class="lead">
                         <div class="row">
                            <div class="col-xs-12">
-                              <input type="range" class="input-block-level" />   
+                              <input type="range" value="0" min="0" max="100" class="input-block-level" />   
                            </div>
                         </div>
                      </div>
                      <div class="lead">
                         <div class="row">
                            <div class="col-xs-3">
-                              <button class="btn btn-lg btn-block btn-default">
+                              <button class="btn btn-lg btn-block btn-info">
                                  <i class="fa fa-backward"></i>
                               </button>
                            </div>
                            <div class="col-xs-6">
-                              <button class="btn btn-lg btn-block btn-default">
+                              <button class="btn btn-lg btn-block btn-success">
                                  <i class="fa fa-play"></i>
                               </button>
                            </div>
                            <div class="col-xs-3">
-                              <button class="btn btn-lg btn-block btn-default">
+                              <button class="btn btn-lg btn-block btn-info">
                                  <i class="fa fa-forward"></i>
                               </button>
                            </div>
@@ -71,7 +71,67 @@
                            <span class="input-group-addon">
                               <i class="fa fa-desktop"></i>
                            </span>
-                           <input type="text" class="form-control" placeholder="Enter Media URL...">
+                           <select class="form-control" ng-options="mediaItem as mediaItem.MediaUrl for mediaItem in mediaItems">
+                              <option value=""></option>
+                           </select>
+                           <span class="input-group-btn">
+                              <button type="button" class="btn btn-info">
+                                 <i class="fa fa-ellipsis-h"></i>   
+                              </button>
+                           </span>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div style="margin-top: 1em">
+                     <div class="panel panel-default">
+                        <div class="panel-heading">
+                           <h3 class="panel-title">Media Items</h3>
+                        </div>
+                        <div class="panel-body">
+                           <div class="well-small">
+                              <div class="row">
+                                 <div class="col-xs-10">
+                                    <input type="text" ng-model="newMediaName" class="form-control" placeholder="Name" />   
+                                 </div>
+                                 <div class="col-xs-2">
+                                    <button class="btn btn-success btn-block">
+                                       <i class="fa fa-plus"></i>
+                                    </button>
+                                 </div>
+                              </div>
+                              <div class="row" style="margin-top: 0.5em">
+                                 <div class="col-xs-9">
+                                    <input type="text" ng-model="newMediaUrl" class="form-control" placeholder="Enter Media URL..." />   
+                                 </div>
+                                 <div class="col-xs-3">
+                                    <select class="form-control" ng-model="newMediaType">
+                                       <option value="video/mp4">MP4 (video)</option>
+                                       <option value="audio/mp3">MP3 (audio)</option>
+                                    </select>
+                                 </div>
+                              </div>
+                              <div style="margin-top: 1em">
+                                 <ul class="list-unstyled">
+                                    <li ng-repeat="mediaItem in mediaItems" class="clearfix" style="margin-bottom: 0.5em">
+                                       <div class="pull-left">mediaItem.Name</div>
+                                       <div class="pull-right">
+                                          <button class="btn btn-sm btn-danger">
+                                             <i class="fa fa-times"></i>
+                                          </button>
+                                       </div>
+                                    </li>
+                                    <li ng-repeat="mediaItem in mediaItems" class="clearfix" style="margin-bottom: 0.5em">
+                                       <div class="pull-left">mediaItem.Name</div>
+                                       <div class="pull-right">
+                                          <button class="btn btn-sm btn-danger">
+                                             <i class="fa fa-times"></i>
+                                          </button>
+                                       </div>
+                                    </li>
+                                 </ul>
+                              </div>
+                           </div>
                         </div>
                      </div>
                   </div>
@@ -90,6 +150,11 @@
       </div>
       
       <script id="style-less" type="style/less">
+         .panel {
+            color: #333;
+            text-shadow: none;
+         }
+
          .media-player {
             border-radius: 4px;
             border: 1px solid white;
