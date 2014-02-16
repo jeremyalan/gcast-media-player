@@ -1,0 +1,51 @@
+<div>
+   <div class="modal-header">
+      <div class="clearfix">
+         <h3 class="pull-left">Media Items</h3>
+         <a href="#" class="close" ng-click="cancel()" nodefault="">×</a>
+      </div>
+      <div>
+         <small>Add/remove media items to cast.</small>
+      </div>
+   </div>
+   <div class="modal-body">
+      <div class="well well-sm">
+         <div class="row">
+            <div class="col-xs-12">
+               <input type="text" ng-model="model.newMediaName" class="form-control" placeholder="Name" />   
+            </div>
+         </div>
+         <div class="row" style="margin-top: 0.5em">
+            <div class="col-xs-8">
+               <input type="text" ng-model="model.newMediaUrl" class="form-control" placeholder="Enter Media URL..." />   
+            </div>
+            <div class="col-xs-4">
+               <select class="form-control" ng-model="model.newMediaType">
+                  <option value="video/mp4">MP4 (video)</option>
+                  <option value="audio/mp3">MP3 (audio)</option>
+               </select>
+            </div>
+         </div>
+         <div class="row" style="margin-top: 0.5em">
+            <div class="col-xs-12">
+               <button class="btn btn-success btn-block" ng-click="addMediaItem()">
+                  <i class="fa fa-plus"></i>
+                  <span> Add Media Item</span>
+               </button>
+            </div>
+         </div>
+      </div>
+      <div ng-show="mediaItems && mediaItems.length > 0" style="margin-top: 1em">
+         <ul class="list-unstyled list-striped list-bordered">
+            <li ng-repeat="mediaItem in mediaItems | orderBy:'Name'" class="clearfix">
+               <div class="pull-left line-height-sm">{{ mediaItem.Name }}</div>
+               <div class="pull-right">
+                  <button class="btn btn-sm btn-danger" ng-click="removeMediaItem(mediaItem)">
+                     <i class="fa fa-times"></i>
+                  </button>
+               </div>
+            </li>
+         </ul>
+      </div>
+   </div>
+</div>

@@ -20,12 +20,20 @@
       <![endif]-->
       
       <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/less.js/1.6.2/less.js"></script>
-      <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
-      <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.10/angular.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.10.0/ui-bootstrap-tpls.min.js"></script>
+      
+      <script type="text/javascript" src="/scripts/app/App.js"></script>
+      <script type="text/javascript" src="/scripts/app/controllers/MainCtrl.js"></script>
+      <script type="text/javascript" src="/scripts/app/controllers/ManageMediaItemsCtrl.js"></script>
+      <script type="text/javascript" src="/scripts/app/services/MediaItemsService.js"></script>
+
       <!--<script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>-->
-      <script type="text/javascript" src="scripts/sender.js"></script>
+      <!--<script type="text/javascript" src="scripts/sender.js"></script>-->
    </head>
-   <body>
+   <body ng-app="gcast-media-player">
       <div class="site-wrapper">
          <div class="site-wrapper-inner">
             <div class="cover-container">
@@ -39,7 +47,7 @@
                </div>
    
                <div class="inner cover">
-                  <div class="media-player">
+                  <div class="media-player" ng-controller="MainCtrl">
                      <div class="lead">
                         <div class="row">
                            <div class="col-xs-12">
@@ -55,7 +63,7 @@
                               </button>
                            </div>
                            <div class="col-xs-6">
-                              <button class="btn btn-lg btn-block btn-success">
+                              <button class="btn btn-lg btn-block btn-info">
                                  <i class="fa fa-play"></i>
                               </button>
                            </div>
@@ -71,67 +79,14 @@
                            <span class="input-group-addon">
                               <i class="fa fa-desktop"></i>
                            </span>
-                           <select class="form-control" ng-options="mediaItem as mediaItem.MediaUrl for mediaItem in mediaItems">
+                           <select class="form-control" ng-model="selectedMediaItem" ng-model="selectedMediaItem" ng-options="mediaItem as mediaItem.Name for mediaItem in mediaItems | orderBy:'Name'">
                               <option value=""></option>
                            </select>
                            <span class="input-group-btn">
-                              <button type="button" class="btn btn-info">
+                              <button type="button" class="btn btn-info" ng-click="manageMediaItems()">
                                  <i class="fa fa-ellipsis-h"></i>   
                               </button>
                            </span>
-                        </div>
-                     </div>
-                  </div>
-
-                  <div style="margin-top: 1em">
-                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                           <h3 class="panel-title">Media Items</h3>
-                        </div>
-                        <div class="panel-body">
-                           <div class="well-small">
-                              <div class="row">
-                                 <div class="col-xs-10">
-                                    <input type="text" ng-model="newMediaName" class="form-control" placeholder="Name" />   
-                                 </div>
-                                 <div class="col-xs-2">
-                                    <button class="btn btn-success btn-block">
-                                       <i class="fa fa-plus"></i>
-                                    </button>
-                                 </div>
-                              </div>
-                              <div class="row" style="margin-top: 0.5em">
-                                 <div class="col-xs-9">
-                                    <input type="text" ng-model="newMediaUrl" class="form-control" placeholder="Enter Media URL..." />   
-                                 </div>
-                                 <div class="col-xs-3">
-                                    <select class="form-control" ng-model="newMediaType">
-                                       <option value="video/mp4">MP4 (video)</option>
-                                       <option value="audio/mp3">MP3 (audio)</option>
-                                    </select>
-                                 </div>
-                              </div>
-                              <div style="margin-top: 1em">
-                                 <ul class="list-unstyled">
-                                    <li ng-repeat="mediaItem in mediaItems" class="clearfix" style="margin-bottom: 0.5em">
-                                       <div class="pull-left">mediaItem.Name</div>
-                                       <div class="pull-right">
-                                          <button class="btn btn-sm btn-danger">
-                                             <i class="fa fa-times"></i>
-                                          </button>
-                                       </div>
-                                    </li>
-                                    <li ng-repeat="mediaItem in mediaItems" class="clearfix" style="margin-bottom: 0.5em">
-                                       <div class="pull-left">mediaItem.Name</div>
-                                       <div class="pull-right">
-                                          <button class="btn btn-sm btn-danger">
-                                             <i class="fa fa-times"></i>
-                                          </button>
-                                       </div>
-                                    </li>
-                                 </ul>
-                              </div>
-                           </div>
                         </div>
                      </div>
                   </div>
@@ -159,6 +114,42 @@
             border-radius: 4px;
             border: 1px solid white;
             padding: 16px;
+         }
+
+         .list-bordered {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+         }
+
+         .list-striped {
+            > li {
+               margin: 0;
+               padding: 4px;
+
+               &:nth-child(odd) {
+                  background: #eee;
+               }
+
+               + li {
+                  border-top: 1px solid #ddd;
+               }
+            }
+         }
+
+         .line-height-sm {
+            line-height: 30px;
+         }
+
+         .modal {
+            color: #333;
+            text-align: left;
+            text-shadow: none;
+
+            .modal-header {
+               h3 {
+                  margin: 0;
+               }
+            }
          }
       </script>
       
