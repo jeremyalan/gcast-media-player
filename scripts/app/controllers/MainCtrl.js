@@ -7,6 +7,8 @@ var MainCtrl = function($scope, $timeout, $modal, $mediaItemsService) {
    var gcastMedia = null;
    var currentMediaId = null;
 
+   $scope.errors = [];
+
    var init = function () {
       var sessionRequest = new chrome.cast.SessionRequest(chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID);
       var apiConfig = new chrome.cast.ApiConfig(sessionRequest, sessionListener, receiverListener);
