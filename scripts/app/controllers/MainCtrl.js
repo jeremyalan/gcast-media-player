@@ -151,7 +151,7 @@ var MainCtrl = function($scope, $timeout, $modal, $mediaItemsService) {
 
    $scope.manageMediaItems = function () {
       $modal.open({
-         templateUrl: '/scripts/app/templates/ManageMediaItems.ng',
+         templateUrl: 'scripts/app/templates/ManageMediaItems.ng',
          controller: 'ManageMediaItemsCtrl'
       }).result.then(function () {
          refreshMediaItems();
