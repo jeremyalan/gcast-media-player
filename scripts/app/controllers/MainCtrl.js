@@ -2,14 +2,36 @@
 
 var module = angular.module('gcast-media-player', ['ui.bootstrap']);
 
-var MainCtrl = function($scope, $modal, $mediaItemsService) {
+var MainCtrl = function($scope, $timeout, $modal, $mediaItemsService) {
    var gcastSession = null;
    var gcastMedia = null;
    var currentMediaId = null;
 
+   var init = function () {
+      var sessionRequest = new chrome.cast.SessionRequest(chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID);
+      var apiConfig = new chrome.cast.ApiConfig(sessionRequest, sessionListener, receiverListener);
+      
+      chrome.cast.initialize(apiConfig, function () {
+         refreshMediaItems();
+      });
+   };
+
+   var reportError = _.curry(function (message, error) {
+      $scope.errors.push(message);
+   });
+
    var refreshMediaItems = function () {
       $mediaItemsService.retrieve().then(function (mediaItems) {
          $scope.mediaItems = mediaItems;
+
+         if ($scope.selectedMediaItem) {
+            $scope.selectedMediaItem = _.find($scope.mediaItems, function (mediaItem) {
+               return mediaItem.Id == $scope.selectedMediaItem.Id;
+            });
+         }
+         else {
+            $scope.selectedMediaItem = _($scope.mediaItems).sortBy('Name').first();
+         }
       })
    };
 
@@ -22,16 +44,6 @@ var MainCtrl = function($scope, $modal, $mediaItemsService) {
    };
 
    var receiverListener = function (e) { };
-
-   var initializeCast = function (onSuccess) {
-      var sessionRequest = new chrome.cast.SessionRequest(chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID);
-      var apiConfig = new chrome.cast.ApiConfig(sessionRequest, sessionListener, receiverListener);
-      
-      chrome.cast.initialize(apiConfig, 
-         function () {
-            onSuccess && onSuccess();
-         });
-   };
 
    var createSession = function (onSuccess) {
       if (gcastSession) {
@@ -48,10 +60,11 @@ var MainCtrl = function($scope, $modal, $mediaItemsService) {
             }
 
             onSuccess && onSuccess();
-         });
+         },
+         reportError('Unable to create Chromecast session'));
    };
 
-   var retrieveMedia = function (media) {
+   var retrieveMedia = function (media, onSuccess) {
       var retrieveMediaCore = function () {
          var mediaInfo = new chrome.cast.media.MediaInfo(media.MediaUrl);
          mediaInfo.contentType = media.MediaType;
@@ -61,13 +74,16 @@ var MainCtrl = function($scope, $modal, $mediaItemsService) {
          gcastSession.loadMedia(request,
             function (m) {
                gcastMedia = m;
+               currentMediaId = media.Id;
+               
                onSuccess && onSuccess();
-            });
+            },
+            reportError('Unable to load media: ' + media.MediaUrl));
       };
 
       var retrieveMediaWithSession = function () {
          if (gcastMedia) {
-            if (currentMediaId == mediaItem.Id) {
+            if (currentMediaId == media.Id) {
                onSuccess && onSuccess();
             }
             else {
@@ -79,7 +95,7 @@ var MainCtrl = function($scope, $modal, $mediaItemsService) {
          }
       };
 
-      if (gcastSession === null) {
+      if (!gcastSession) {
          createSession(retrieveMediaWithSession);
       }
       else {
@@ -89,27 +105,34 @@ var MainCtrl = function($scope, $modal, $mediaItemsService) {
 
    var playMedia = function (media, onSuccess) {
       var playMediaCore = function () {
-         gcastMedia.play(null);
+         gcastMedia.play(null, angular.noop);
          onSuccess && onSuccess();
       };
 
-      
+      retrieveMedia(media, playMediaCore);
    };
 
-   var pauseMedia = function () {
-      if (media === null) {
-         log('Unable to pause, media has not been loaded.');
+   var pauseMedia = function (onSuccess) {
+      if (!gcastMedia) {
          return;
       }
 
-      log('Pausing media...');
+      gcastMedia.pause(null, function () {
+         onSuccess && onSuccess();
+      });
+   };
 
-      gcastMedia.pause(null,
+   var seekMedia = function (delta, onSuccess) {
+      if (!gcastMedia) {
+         return;
+      }
+
+      var request = new chrome.cast.media.SeekRequest();
+      request.currentTime = gcastMedia.currentTime + delta;
+      
+      gcastMedia.seek(request,
          function () {
-            log('Pause succeeded.');
-         },
-         function () {
-            log('Pause failed.');
+            onSuccess && onSuccess();
          });
    };
 
@@ -124,27 +147,6 @@ var MainCtrl = function($scope, $modal, $mediaItemsService) {
             gcastMedia = null;
             onSuccess && onSuccess();
          });
-   };
-
-   var seekMedia = function (delta) {
-      if (media === null) {
-         log('Unable to seek, media has not been loaded.');
-         return;
-      }
-
-      log('Seeking media...');
-
-      var request = new chrome.cast.media.SeekRequest();
-      request.currentTime = gcastMedia.currentTime + delta;
-      
-      gcastMedia.seek(request,
-         function () {
-            log('Seek succeeded.');
-         },
-         function () {
-            log('Seek failed.');
-         }
-      );
    };
 
    $scope.manageMediaItems = function () {
@@ -164,21 +166,48 @@ var MainCtrl = function($scope, $modal, $mediaItemsService) {
          return;
       }
 
-      playMedia(mediaItem);
+      playMedia(mediaItem, function () {
+         $scope.$digest();
+      });
+   };
+
+   $scope.pause = function () {
+      var mediaItem = $scope.selectedMediaItem;
+
+      if (!mediaItem) {
+         alert ('Please select a media item to cast.');
+         return;
+      }
+
+      pauseMedia(function () {
+         $scope.$digest();
+      });
    };
 
    $scope.seekBackward = function () {
-
+      seekMedia(-10, function () {
+         $scope.$digest();
+      });
    };
 
    $scope.seekForward = function () {
-
+      seekMedia(10, function () {
+         $scope.$digest();
+      });
    };
 
-   refreshMediaItems();
+   $scope.isPlaying = function () {
+      if (!gcastMedia) {
+         return false;
+      }
+
+      return gcastMedia.playerState == chrome.cast.media.PlayerState.PLAYING;
+   };
+
+   $timeout(init, 1500);
 };
 
-MainCtrl.$inject = ['$scope', '$modal', '$mediaItemsService'];
+MainCtrl.$inject = ['$scope', '$timeout', '$modal', '$mediaItemsService'];
 
 module.controller('MainCtrl', MainCtrl);
 

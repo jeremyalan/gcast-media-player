@@ -33,7 +33,7 @@
       <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
       <!--<script type="text/javascript" src="scripts/sender.js"></script>-->
    </head>
-   <body ng-app="gcast-media-player">
+   <body>
       <div class="site-wrapper">
          <div class="site-wrapper-inner">
             <div class="cover-container">
@@ -48,6 +48,16 @@
    
                <div class="inner cover">
                   <div class="media-player" ng-controller="MainCtrl">
+                     <div class="lead" ng-show="errors && errors.length > 0">
+                        <div class="alert alert-info">
+                           <button type="button" class="close" ng-click="errors = []">&times;</button>
+                           <ul class="list-unstyled">
+                              <li ng-repeat="error in errors">
+                                 <span>{{ error }}</span>
+                              </li>
+                           </ul>
+                        </div>
+                     </div>
                      <div class="lead">
                         <div class="row">
                            <div class="col-xs-12">
@@ -58,17 +68,22 @@
                      <div class="lead">
                         <div class="row">
                            <div class="col-xs-3">
-                              <button class="btn btn-lg btn-block btn-info">
+                              <button class="btn btn-lg btn-block btn-info" ng-click="seekBackward()">
                                  <i class="fa fa-backward"></i>
                               </button>
                            </div>
-                           <div class="col-xs-6">
-                              <button class="btn btn-lg btn-block btn-info">
+                           <div class="col-xs-6" ng-show="!isPlaying()">
+                              <button class="btn btn-lg btn-block btn-info" ng-click="play()">
                                  <i class="fa fa-play"></i>
                               </button>
                            </div>
+                           <div class="col-xs-6" ng-show="isPlaying()">
+                              <button class="btn btn-lg btn-block btn-info" ng-click="pause()">
+                                 <i class="fa fa-pause"></i>
+                              </button>
+                           </div>
                            <div class="col-xs-3">
-                              <button class="btn btn-lg btn-block btn-info">
+                              <button class="btn btn-lg btn-block btn-info" ng-click="seekForward()">
                                  <i class="fa fa-forward"></i>
                               </button>
                            </div>
@@ -79,9 +94,7 @@
                            <span class="input-group-addon">
                               <i class="fa fa-desktop"></i>
                            </span>
-                           <select class="form-control" ng-model="selectedMediaItem" ng-model="selectedMediaItem" ng-options="mediaItem as mediaItem.Name for mediaItem in mediaItems | orderBy:'Name'">
-                              <option value=""></option>
-                           </select>
+                           <select class="form-control" ng-model="selectedMediaItem" ng-model="selectedMediaItem" ng-options="mediaItem as mediaItem.Name for mediaItem in mediaItems | orderBy:'Name'"></select>
                            <span class="input-group-btn">
                               <button type="button" class="btn btn-info" ng-click="manageMediaItems()">
                                  <i class="fa fa-ellipsis-h"></i>   
@@ -113,7 +126,13 @@
          .media-player {
             border-radius: 4px;
             border: 1px solid white;
+            text-align: left;
             padding: 16px;
+
+            .alert {
+               font-size: 14px;
+               text-shadow: none;
+            }
          }
 
          .list-bordered {
