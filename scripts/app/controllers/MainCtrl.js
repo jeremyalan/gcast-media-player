@@ -77,6 +77,8 @@ var MainCtrl = function($scope, $timeout, $modal, $mediaItemsService) {
             function (m) {
                gcastMedia = m;
                currentMediaId = media.Id;
+
+               $scope.totalDuration = gcastMedia.media.duration;
                
                onSuccess && onSuccess();
             },
@@ -124,18 +126,26 @@ var MainCtrl = function($scope, $timeout, $modal, $mediaItemsService) {
       });
    };
 
-   var seekMedia = function (delta, onSuccess) {
+   var seekMediaByPosition = function (positionInSeconds, onSuccess) {
       if (!gcastMedia) {
          return;
       }
 
       var request = new chrome.cast.media.SeekRequest();
-      request.currentTime = gcastMedia.currentTime + delta;
+      request.currentTime = positionInSeconds;
       
       gcastMedia.seek(request,
          function () {
             onSuccess && onSuccess();
          });
+   };
+
+   var seekMediaByOffset = function (delta, onSuccess) {
+      if (!gcastMedia) {
+         return;
+      }
+
+      seekMediaByPosition(gcastMedia.currentTime + delta, onSuccess);
    };
 
    var stopMedia = function (onSuccess) {
@@ -187,13 +197,13 @@ var MainCtrl = function($scope, $timeout, $modal, $mediaItemsService) {
    };
 
    $scope.seekBackward = function () {
-      seekMedia(-10, function () {
+      seekMediaByOffset(-10, function () {
          $scope.$digest();
       });
    };
 
    $scope.seekForward = function () {
-      seekMedia(10, function () {
+      seekMediaByOffset(10, function () {
          $scope.$digest();
       });
    };
@@ -205,6 +215,32 @@ var MainCtrl = function($scope, $timeout, $modal, $mediaItemsService) {
 
       return gcastMedia.playerState == chrome.cast.media.PlayerState.PLAYING;
    };
+
+   var suspendSeek = true;
+
+   $scope.$watch('seekPosition', function (newValue) {
+      if (!suspendSeek) {
+         seekMediaByPosition(newValue);   
+      }
+   });
+
+   var updateCurrentPosition = function () {
+      if (gcastMedia) {
+         suspendSeek = true;
+         
+         $scope.seekPosition = gcastMedia.currentTime;
+
+         $timeout(function () {
+            suspendSeek = false;
+         }, 0);
+      }
+
+      $timeout(updateCurrentPosition, 1000);
+   };
+
+   updateCurrentPosition();
+
+   suspendSeek = false;
 
    $timeout(init, 1500);
 };
