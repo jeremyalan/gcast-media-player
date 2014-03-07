@@ -2,9 +2,11 @@
 
 var module = angular.module('gcast-media-player', ['ui.bootstrap']);
 
-var MainCtrl = function($scope, $timeout, $modal, $mediaItemsService) {
+var MainCtrl = function($scope, $sce, $timeout, $modal, $mediaItemsService) {
    var gcastSession = null;
    var gcastMedia = null;
+   var html5Video = null;
+   var html5Audio = null;
    var currentMediaId = null;
 
    $scope.errors = [];
@@ -13,9 +15,10 @@ var MainCtrl = function($scope, $timeout, $modal, $mediaItemsService) {
       var sessionRequest = new chrome.cast.SessionRequest(chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID);
       var apiConfig = new chrome.cast.ApiConfig(sessionRequest, sessionListener, receiverListener);
       
-      chrome.cast.initialize(apiConfig, function () {
-         refreshMediaItems();
-      });
+      refreshMediaItems();
+
+      chrome.cast.initialize(apiConfig, angular.noop);
+      
    };
 
    var reportError = _.curry(function (message, error) {
@@ -34,18 +37,38 @@ var MainCtrl = function($scope, $timeout, $modal, $mediaItemsService) {
          else {
             $scope.selectedMediaItem = _($scope.mediaItems).sortBy('Name').first();
          }
-      })
+      });
    };
 
-   var sessionListener = function (e) {
-      gcastSession = e;
+   var clearSession = function () {
+      gcastSession = null;
+      gcastMedia = null;
+      currentMediaId = null;
+   };
 
-      if (gcastSession.media.length !== 0) {
-         gcastMedia = gcastSession.media[0];
+   var assignSession = function (session) {
+      gcastSession = session;
+
+      if (gcastSession) {
+         gcastSession.addUpdateListener(function (isAlive) {
+            if (!isAlive) {
+               clearSession();
+            }
+         });
+
+         if (gcastSession.media.length !== 0) {
+            gcastMedia = gcastSession.media[0];
+         }
       }
    };
 
-   var receiverListener = function (e) { };
+   var sessionListener = function (s) {
+      assignSession(s);
+   };
+
+   var receiverListener = function (e) {
+      $scope.isAvailable = (e == 'available');
+   };
 
    var createSession = function (onSuccess) {
       if (gcastSession) {
@@ -55,11 +78,7 @@ var MainCtrl = function($scope, $timeout, $modal, $mediaItemsService) {
 
       chrome.cast.requestSession(
          function (s) {
-            gcastSession = s;
-
-            if (gcastSession.media.length !== 0) {
-               gcastMedia = gcastSession.media[0];
-            }
+            assignSession(s);
 
             onSuccess && onSuccess();
          },
@@ -161,6 +180,14 @@ var MainCtrl = function($scope, $timeout, $modal, $mediaItemsService) {
          });
    };
 
+   $scope.createSession = function () {
+      createSession();
+   }
+
+   $scope.isSessionActive = function () {
+      return !!gcastSession;
+   }
+
    $scope.manageMediaItems = function () {
       $modal.open({
          templateUrl: 'scripts/app/templates/ManageMediaItems.ng',
@@ -178,9 +205,24 @@ var MainCtrl = function($scope, $timeout, $modal, $mediaItemsService) {
          return;
       }
 
-      playMedia(mediaItem, function () {
-         $scope.$digest();
-      });
+      if (gcastSession) {
+         playMedia(mediaItem, function () {
+            $scope.$digest();
+         });
+      }
+      else {
+         if (mediaItem.MediaType == 'video/mp4') {
+            $scope.html5Video = $sce.trustAsResourceUrl(mediaItem.MediaUrl);
+         }
+         else if (mediaItem.MediaType == 'audio/mp3') {
+            $scope.html5Audio = $sce.trustAsResourceUrl(mediaItem.MediaUrl);
+         }
+      }
+   };
+
+   $scope.closeHtml5Media = function () {
+      $scope.html5Video = null;
+      $scope.html5Audio = null;
    };
 
    $scope.pause = function () {
@@ -245,7 +287,7 @@ var MainCtrl = function($scope, $timeout, $modal, $mediaItemsService) {
    $timeout(init, 1500);
 };
 
-MainCtrl.$inject = ['$scope', '$timeout', '$modal', '$mediaItemsService'];
+MainCtrl.$inject = ['$scope', '$sce', '$timeout', '$modal', '$mediaItemsService'];
 
 module.controller('MainCtrl', MainCtrl);
 

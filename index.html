@@ -40,7 +40,7 @@
               data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" />
       </a>
 
-      <div class="site-wrapper">
+      <div class="site-wrapper" ng-controller="MainCtrl">
          <div class="site-wrapper-inner">
             <div class="cover-container">
                <div class="masthead clearfix">
@@ -53,7 +53,7 @@
                </div>
    
                <div class="inner cover">
-                  <div class="media-player" ng-controller="MainCtrl">
+                  <div class="media-player">
                      <div class="lead" ng-show="errors && errors.length > 0">
                         <div class="alert alert-info">
                            <button type="button" class="close" ng-click="errors = []">&times;</button>
@@ -66,8 +66,13 @@
                      </div>
                      <div class="lead">
                         <div class="row">
-                           <div class="col-xs-12">
+                           <div class="col-xs-11">
                               <input type="range" ng-model="seekPosition" min="0" max="{{ totalDuration }}" class="input-block-level" />   
+                           </div>
+                           <div class="col-xs-1">
+                              <a href="#" ng-click="createSession()" ng-show="isAvailable">
+                                 <img ng-src="styles/images/chromecast-{{ isSessionActive() ? 'active' : 'inactive' }}.png" style="width: 100%; vertical-align: top" />
+                              </a>
                            </div>
                         </div>
                      </div>
@@ -109,8 +114,28 @@
                         </div>
                      </div>
                   </div>
+                  
+                  <div class="media-player" style="margin-top: 10px" ng-show="html5Video || html5Audio">
+                     <div ng-if="html5Video">
+                        <video width="100%" controls>
+                           <source ng-src="{{ html5Video }}" type="video/mp4"></source>
+                        </video>
+                     </div>
+                     <div ng-if="html5Audio">
+                        <audio width="100%" controls>
+                           <source ng-src="{{ html5Audio }}" type="audio/mp3"></source>
+                        </audio>
+                     </div>
+
+                     <div ng-click="closeHtml5Media()">
+                        <button class="btn btn-sm btn-block btn-info">
+                           <i class="fa fa-eye-slash"></i>
+                           <span> Hide this window</span>
+                        </button>
+                     </div>
+                  </div>
                </div>
-   
+
                <div class="mastfoot">
                   <div class="inner">
                      <p>
