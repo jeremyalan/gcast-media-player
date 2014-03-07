@@ -10,13 +10,14 @@ var MainCtrl = function($scope, $sce, $timeout, $modal, $mediaItemsService) {
    $scope.errors = [];
 
    var init = function () {
-      var sessionRequest = new chrome.cast.SessionRequest(chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID);
-      var apiConfig = new chrome.cast.ApiConfig(sessionRequest, sessionListener, receiverListener);
-      
       refreshMediaItems();
 
-      chrome.cast.initialize(apiConfig, angular.noop);
-      
+      if (chrome && chrome.cast) {
+         var sessionRequest = new chrome.cast.SessionRequest(chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID);
+         var apiConfig = new chrome.cast.ApiConfig(sessionRequest, sessionListener, receiverListener);
+         
+         chrome.cast.initialize(apiConfig, angular.noop);      
+      }
    };
 
    var reportError = _.curry(function (message, error) {
