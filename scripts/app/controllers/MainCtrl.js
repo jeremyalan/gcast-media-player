@@ -5,8 +5,6 @@ var module = angular.module('gcast-media-player', ['ui.bootstrap']);
 var MainCtrl = function($scope, $sce, $timeout, $modal, $mediaItemsService) {
    var gcastSession = null;
    var gcastMedia = null;
-   var html5Video = null;
-   var html5Audio = null;
    var currentMediaId = null;
 
    $scope.errors = [];
