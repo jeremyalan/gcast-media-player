@@ -38,12 +38,14 @@
       <div ng-show="mediaItems && mediaItems.length > 0" style="margin-top: 1em">
          <ul class="list-unstyled list-striped list-bordered" style="max-height: 250px; overflow: auto">
             <li ng-repeat="mediaItem in mediaItems | orderBy:'Name'" class="clearfix">
-               <div class="pull-left line-height-sm">{{ mediaItem.Name }}</div>
                <div class="pull-right">
                   <button class="btn btn-sm btn-danger" ng-click="removeMediaItem(mediaItem)">
                      <i class="fa fa-times"></i>
                   </button>
                </div>
+
+               <div class="line-height-sm">{{ mediaItem.Name }}</div>
+               <div class="line-height-single text-muted smaller-75">{{ mediaItem.MediaUrl }}</div>
             </li>
          </ul>
       </div>
